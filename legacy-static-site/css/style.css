@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+*{
+    /* font-family: "Playfair Display", serif; */
+    font-family: "Dancing Script", cursive;
+    margin: 0;
+    padding: 0;
+    color: whitesmoke;
+}
+
+body {
+    background-image: url("background.jpg");
+  }
+
+
+nav{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px;
+    padding: 5px;
+}
+
+.navimg{
+    width: 25px;
+    height: 25px;
+    background-color: whitesmoke;
+    cursor: pointer;
+}
+
+nav ul{
+    display: flex;
+    gap: 70px;
+}
+
+nav ul li{
+    list-style: none;
+}
+
+section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 45px;
+    padding: 80px 0;
+}
+.container{
+    display: flex;
+    gap: 26px;
+    margin: 30px;
+    padding: 10px;
+}
+.skillbox{
+    height: 28vh;
+    width: 16vw;
+    border-radius: 11px;
+}
+
+.skillbox img {
+    height: 209px;
+    width: 246px;
+    object-fit: cover;
+    border-radius: 9px;
+}
+
+.projcontainer{
+    border: 2px solid whitesmoke;
+    border-radius: 7px;
+    width: 57vw;
+    height: 75vh;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 25px;
+}
+
+.projcontainer img{
+    width: 300px;
+    height: 300px;
+    padding: 15px;
+}
+
+.projectdecp{
+    padding: 20px;
+    font-size: 38px;
+}
