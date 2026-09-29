@@ -1,7 +1,12 @@
 // Absolute site URL for metadata, sitemap and Open Graph images.
-// Set NEXT_PUBLIC_SITE_URL once you have a custom domain; Vercel's production URL is used otherwise.
+// Production uses the custom domain; previews use their own vercel.app URL.
+// NEXT_PUBLIC_SITE_URL overrides both.
+export const productionUrl = "https://www.kaustubhchaphekar.online";
+
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000");
+  (process.env.VERCEL_ENV === "production"
+    ? productionUrl
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");

@@ -59,7 +59,7 @@ npm run capture:fallbacks       # terminal 2 (needs Chrome or Edge installed)
 | `QUOTE_TO_EMAIL` | optional | Defaults to the email in `lib/data.ts`. |
 | `QUOTE_FROM_EMAIL` | optional | Set to an address on your verified domain to turn on visitor auto-replies. |
 | `CHAT_DAILY_LIMIT` | optional | Chat messages per server instance per day (default 400). |
-| `NEXT_PUBLIC_SITE_URL` | optional | Your custom domain, for SEO. Vercel's URL is used otherwise. |
+| `NEXT_PUBLIC_SITE_URL` | optional | Overrides the site URL used for SEO. Production already uses `https://www.kaustubhchaphekar.online` (set in `lib/site.ts`). |
 
 ## Deploy to Vercel
 
@@ -67,7 +67,7 @@ npm run capture:fallbacks       # terminal 2 (needs Chrome or Edge installed)
 2. On [vercel.com/new](https://vercel.com/new), import that repo. Vercel detects Next.js; keep the default build settings.
 3. Under **Settings → Environment Variables**, add `RESEND_API_KEY` and `ANTHROPIC_API_KEY`, then **Redeploy**.
 4. Under **Analytics** and **Speed Insights**, click **Enable**. Page views, Core Web Vitals and events (`quote_submitted`, `chat_opened`, `whatsapp_click`, `resume_download`) start flowing in. Custom events need a Pro plan; page views and Web Vitals work on Hobby.
-5. Once you buy a domain, add it under **Settings → Domains**, set `NEXT_PUBLIC_SITE_URL`, verify the domain in Resend and set `QUOTE_FROM_EMAIL`.
+5. The domain `kaustubhchaphekar.online` is registered at Hostinger. Its DNS has an `A` record for `@` pointing to Vercel and a `CNAME` for `www` pointing to Vercel, and `www` is the primary domain. To send auto-replies, verify the domain in Resend and set `QUOTE_FROM_EMAIL`.
 
 Every push to `main` redeploys automatically.
 
