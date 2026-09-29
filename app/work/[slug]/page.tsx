@@ -5,7 +5,7 @@ import ProjectArt from "@/components/sections/ProjectArt";
 import { ArrowIcon, DownloadIcon } from "@/components/ui";
 import FlowDiagram from "@/components/work/FlowDiagram";
 import { caseStudies, getCaseStudy } from "@/lib/case-studies";
-import { profile, whatsappLink } from "@/lib/data";
+import { experience, profile, whatsappLink } from "@/lib/data";
 import { siteUrl } from "@/lib/site";
 
 export const dynamicParams = false;
@@ -81,6 +81,17 @@ export default async function CaseStudyPage({ params }: Props) {
             {study.title}
           </h1>
           <p className="mt-6 max-w-3xl text-lg leading-relaxed text-ink/75 sm:text-xl">{study.subtitle}</p>
+          {study.kind.startsWith(experience.company) && (
+            <a
+              href={experience.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group mt-7 inline-flex items-center gap-2 rounded-full border border-line-strong px-5 py-2.5 text-sm transition hover:border-cyan/60"
+            >
+              Visit {experience.company}
+              <ArrowIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </a>
+          )}
         </header>
 
         <dl className="mt-10 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-3">

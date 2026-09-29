@@ -1,6 +1,5 @@
 import { caseStudies } from "@/lib/case-studies";
 import { musicArtist, nav, profile, whatsappLink } from "@/lib/data";
-import EffectsToggle from "../EffectsToggle";
 
 export default function Footer() {
   return (
@@ -44,11 +43,10 @@ export default function Footer() {
             ))}
           </nav>
         </div>
-        <div className="mt-12 flex flex-col gap-4 border-t border-line pt-6 text-xs text-faint md:flex-row md:items-center md:justify-between">
+        <div className="mt-12 border-t border-line pt-6 text-xs text-faint">
           <p>
             © {new Date().getFullYear()} {profile.name}. Built with Next.js, React Three Fiber and three.js.
           </p>
-          <EffectsToggle />
         </div>
         <p className="mt-4 text-xs leading-relaxed text-faint">
           Robot by{" "}

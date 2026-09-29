@@ -52,6 +52,7 @@ const facts = {
 const links = [
   `Quote request form: /#quote`,
   `Experience: /#experience`,
+  `${experience.company} website: ${experience.url}`,
   `AI Social Agent section: /#ai-agent`,
   ...caseStudies.map((c) => `Case study, ${c.title}: /work/${c.slug}`),
   `Résumé PDF: ${profile.resume}`,

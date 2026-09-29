@@ -54,6 +54,7 @@ export const pillars = [
 export const experience = {
   role: "Full-Stack Developer & Tech Lead",
   company: "Wallxy",
+  url: "https://wallxy.com",
   period: "03/2024 – Present",
   location: "Nashik",
   intro:

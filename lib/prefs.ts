@@ -85,15 +85,6 @@ export function ensureQuality() {
   else window.setTimeout(run, 300);
 }
 
-export function setEffects(effects: EffectsPref) {
-  write("effects", effects);
-  if (effects === "auto") {
-    set({ effects, quality: "pending" });
-    probing = false;
-    ensureQuality();
-  } else set({ effects, quality: effects === "on" ? "full" : "static" });
-}
-
 // Called when a live scene can't hold its frame rate.
 export function degradeToStatic() {
   if (state.effects !== "on") set({ quality: "static" });

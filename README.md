@@ -12,7 +12,7 @@ A Next.js 16 portfolio with real-time 3D (React Three Fiber + three.js), case st
 - **Ask my AI**: a chat widget powered by Claude (`claude-opus-5`, low effort, streaming, prompt-cached). It answers only from this site's data.
 - **Reaching me**: a quote form with email via Resend (plus an optional auto-reply), a WhatsApp button, an optional booking link, and Vercel Analytics events.
 - **Sound**: ambient music toggle (CC0 tracks, downloaded only when switched on) and soft UI blips.
-- **Fallbacks for weak devices**: devices with no GPU, low memory, data-saver or reduced motion get still images of every scene and never download three.js. Visitors can also switch 3D on or off in the footer.
+- **Fallbacks for weak devices**: devices with no GPU, low memory, data-saver or reduced motion get still images of every scene and never download three.js.
 
 ## Edit the content
 

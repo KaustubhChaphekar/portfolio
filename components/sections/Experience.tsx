@@ -1,5 +1,5 @@
 import { experience } from "@/lib/data";
-import { Reveal, SectionHeading } from "../ui";
+import { ArrowIcon, Reveal, SectionHeading } from "../ui";
 
 export default function Experience() {
   return (
@@ -25,6 +25,15 @@ export default function Experience() {
               <p className="mt-1 text-sm text-muted">
                 {experience.company} · {experience.location}
               </p>
+              <a
+                href={experience.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-5 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-bg transition hover:bg-cyan"
+              >
+                Visit {experience.company}
+                <ArrowIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
 
               <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.18em] text-faint">Modules shipped</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
