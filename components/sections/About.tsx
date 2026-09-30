@@ -1,21 +1,29 @@
 import { pillars, profile, stats } from "@/lib/data";
+import Portrait from "../Portrait";
 import { CountUp, Reveal, SectionHeading } from "../ui";
 
 export default function About() {
   return (
     <section id="about" className="cv-section relative scroll-mt-20 py-28 md:py-40">
       <div className="section">
-        <SectionHeading
-          index="01"
-          eyebrow="About"
-          title={
-            <>
-              I own products <span className="text-muted">from the first commit</span> to the production dashboard.
-            </>
-          }
-        >
-          {profile.summary}
-        </SectionHeading>
+        <div className="grid grid-cols-1 gap-x-12 lg:grid-cols-12 lg:items-center">
+          <div className="lg:col-span-7 xl:col-span-8">
+            <SectionHeading
+              index="01"
+              eyebrow="About"
+              title={
+                <>
+                  I own products <span className="text-muted">from the first commit</span> to the production dashboard.
+                </>
+              }
+            >
+              {profile.summary}
+            </SectionHeading>
+          </div>
+          <Reveal className="mb-12 lg:col-span-5 lg:mb-16 xl:col-span-4" delay={0.1}>
+            <Portrait />
+          </Reveal>
+        </div>
 
         <Reveal>
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line lg:grid-cols-4">

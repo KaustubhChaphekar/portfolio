@@ -12,6 +12,7 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/kaustubh-chaphekar-569815161",
   github: "https://github.com/KaustubhChaphekar",
   resume: "/Kaustubh_Chaphekar_Resume.pdf",
+  photo: "/me/kaustubh-chaphekar.jpg",
   // WhatsApp number in international format, digits only (country code first).
   whatsapp: "917218791254",
   whatsappMessage: "Hi Kaustubh, I found your portfolio and I'd like to talk about a website/project.",

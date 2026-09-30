@@ -33,6 +33,7 @@ const person = {
   description: profile.summary,
   url: productionUrl,
   email: `mailto:${profile.email}`,
+  image: { "@type": "ImageObject", url: `${productionUrl}${profile.photo}`, width: 1254, height: 1254, caption: profile.name },
   sameAs: [profile.linkedin, profile.github],
   address: { "@type": "PostalAddress", addressLocality: "Nashik", addressRegion: "Maharashtra", addressCountry: "IN" },
   worksFor: { "@type": "Organization", "@id": ids.wallxy, name: experience.company, url: experience.url },

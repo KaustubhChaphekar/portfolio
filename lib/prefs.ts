@@ -37,25 +37,63 @@ function write(key: string, value: string) {
 }
 
 // Weak or GPU-less devices get still images instead of live WebGL.
-function deviceNeedsStatic() {
+function cheapChecksSayStatic() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
   const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
   if (nav.connection?.saveData) return true;
   if (nav.deviceMemory !== undefined && nav.deviceMemory <= 2) return true;
   if (nav.hardwareConcurrency && nav.hardwareConcurrency <= 2) return true;
+  return false;
+}
+
+// Creates a throwaway WebGL context and reports whether it's a real GPU. Its source also runs
+// in a Web Worker (via OffscreenCanvas) so the check never blocks the page — so it must only
+// use its argument and browser globals. failIfMajorPerformanceCaveat makes software renderers
+// refuse quickly.
+function probe(canvas: HTMLCanvasElement | OffscreenCanvas): Quality {
   try {
-    // failIfMajorPerformanceCaveat makes software renderers (no GPU) refuse quickly.
-    const canvas = document.createElement("canvas");
     const gl = canvas.getContext("webgl", { failIfMajorPerformanceCaveat: true }) as WebGLRenderingContext | null;
-    if (!gl) return true;
+    if (!gl) return "static";
     const info = gl.getExtension("WEBGL_debug_renderer_info");
     const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
     gl.getExtension("WEBGL_lose_context")?.loseContext();
-    if (/swiftshader|llvmpipe|software|basic render/i.test(renderer)) return true;
+    return /swiftshader|llvmpipe|software|basic render/i.test(renderer) ? "static" : "full";
   } catch {
-    return true;
+    return "static";
   }
-  return false;
+}
+
+function probeInWorker(): Promise<Quality | null> {
+  if (typeof Worker === "undefined" || typeof OffscreenCanvas === "undefined") return Promise.resolve(null);
+  return new Promise((resolve) => {
+    let url = "";
+    let worker: Worker | null = null;
+    const finish = (result: Quality | null) => {
+      window.clearTimeout(timer);
+      worker?.terminate();
+      if (url) URL.revokeObjectURL(url);
+      resolve(result);
+    };
+    const timer = window.setTimeout(() => finish(null), 4000);
+    try {
+      url = URL.createObjectURL(
+        new Blob([`self.onmessage = () => self.postMessage((${probe.toString()})(new OffscreenCanvas(1, 1)));`], {
+          type: "text/javascript",
+        }),
+      );
+      worker = new Worker(url);
+      worker.onmessage = (e) => finish(e.data === "full" || e.data === "static" ? e.data : null);
+      worker.onerror = () => finish(null);
+      worker.postMessage(0);
+    } catch {
+      finish(null);
+    }
+  });
+}
+
+async function detectQuality(): Promise<Quality> {
+  if (cheapChecksSayStatic()) return "static";
+  return (await probeInWorker()) ?? probe(document.createElement("canvas"));
 }
 
 let initialised = false;
@@ -79,7 +117,12 @@ let probing = false;
 export function ensureQuality() {
   if (state.quality !== "pending" || probing || typeof window === "undefined") return;
   probing = true;
-  const run = () => set({ quality: deviceNeedsStatic() ? "static" : "full" });
+  const run = () => {
+    detectQuality().then((quality) => {
+      // A visitor may have forced a mode meanwhile (?effects=on/off); don't override it.
+      if (state.quality === "pending") set({ quality });
+    });
+  };
   const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
   if (w.requestIdleCallback) w.requestIdleCallback(run, { timeout: 1500 });
   else window.setTimeout(run, 300);

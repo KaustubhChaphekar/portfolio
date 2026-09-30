@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { profile } from "@/lib/data";
 import { useLocalTime } from "@/lib/hooks";
+import { Avatar } from "../Portrait";
 import { ArrowIcon, DownloadIcon } from "../ui";
 
 // The hero animates with CSS keyframes (see globals.css), not JS, so the text paints
@@ -37,9 +38,10 @@ export default function Hero() {
           <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </a>
 
-        <p className="eyebrow hero-fade" style={delay(0.15)}>
-          {profile.role}
-        </p>
+        <div className="hero-fade flex items-center gap-3" style={delay(0.15)}>
+          <Avatar size={36} />
+          <p className="eyebrow">{profile.role}</p>
+        </div>
 
         <h1 className="mt-5 font-display text-[clamp(3.2rem,11vw,9.5rem)] font-semibold leading-[0.88] tracking-[-0.045em]">
           <span className="sr-only">{profile.name}</span>

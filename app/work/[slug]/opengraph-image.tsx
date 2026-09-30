@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { caseStudies, getCaseStudy } from "@/lib/case-studies";
 import { profile } from "@/lib/data";
+import { ogPhoto } from "@/lib/og-photo";
 
 export const alt = "Case study";
 export const size = { width: 1200, height: 630 };
@@ -12,6 +13,7 @@ export function generateStaticParams() {
 
 export default async function OpengraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const study = getCaseStudy((await params).slug);
+  const photo = await ogPhoto();
   return new ImageResponse(
     (
       <div
@@ -36,15 +38,21 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
           <div style={{ fontSize: 30, color: "#c9cddb", lineHeight: 1.35, maxWidth: 980 }}>{study?.subtitle}</div>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 24 }}>
-          <div
-            style={{
-              backgroundImage: "linear-gradient(90deg, #5ee7ff, #9b8cff 50%, #ff6fae)",
-              backgroundClip: "text",
-              color: "transparent",
-              fontWeight: 600,
-            }}
-          >
-            {profile.name}
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ display: "flex", padding: 3, borderRadius: 999, backgroundImage: "linear-gradient(135deg, #5ee7ff, #9b8cff 55%, #ff6fae)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- rendered by Satori, not the browser */}
+              <img src={photo} alt="" width={60} height={60} style={{ borderRadius: 999, objectFit: "cover", objectPosition: "50% 30%" }} />
+            </div>
+            <div
+              style={{
+                backgroundImage: "linear-gradient(90deg, #5ee7ff, #9b8cff 50%, #ff6fae)",
+                backgroundClip: "text",
+                color: "transparent",
+                fontWeight: 600,
+              }}
+            >
+              {profile.name}
+            </div>
           </div>
           <div style={{ color: "#8b91a5" }}>{study?.period}</div>
         </div>
