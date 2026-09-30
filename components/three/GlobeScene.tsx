@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { pointer } from "@/lib/hooks";
 import LazyCanvas from "./LazyCanvas";
+import { useCanvasDrag } from "./useCanvasDrag";
 
 const R = 1.6;
 const MASK = "/textures/earth-specular.jpg"; // equirectangular: land is black, ocean white
@@ -166,7 +167,12 @@ function Globe({ markers, activeIndex, draggable }: GlobeProps) {
   const positions = useLandDots(26000);
   const focusMarker = markers[activeIndex] ?? markers[0];
   const target = facing(focusMarker.lat, focusMarker.lon);
-  const drag = useRef({ active: false, x: 0, y: 0, yaw: 0, pitch: 0 });
+  const drag = useRef({ yaw: 0, pitch: 0 });
+  // Mouse drags spin and tilt; sideways swipes on touch spin (vertical swipes still scroll the page).
+  const dragState = useCanvasDrag(draggable, (dx, dy, mouse) => {
+    drag.current.yaw += dx * 0.008;
+    if (mouse) drag.current.pitch += dy * 0.006;
+  });
   // Initial orientation only; later focus changes animate in useFrame instead of snapping.
   const [initialRotation] = useState<[number, number, number]>(() => [target.x, target.y, 0]);
 
@@ -214,13 +220,14 @@ function Globe({ markers, activeIndex, draggable }: GlobeProps) {
     if (!g) return;
     const t = state.clock.elapsedTime;
     const d = drag.current;
+    const active = dragState.current.active;
     // Take the short way round when the target longitude wraps.
-    let ty = target.y + d.yaw + (d.active ? 0 : Math.sin(t * 0.25) * 0.25 + pointer.x * 0.2);
+    let ty = target.y + d.yaw + (active ? 0 : Math.sin(t * 0.25) * 0.25 + pointer.x * 0.2);
     while (ty - g.rotation.y > Math.PI) ty -= Math.PI * 2;
     while (ty - g.rotation.y < -Math.PI) ty += Math.PI * 2;
-    const tx = THREE.MathUtils.clamp(target.x + d.pitch - (d.active ? 0 : pointer.y * 0.1), -1.2, 1.2);
-    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, tx, d.active ? 12 : 2.2, delta);
-    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, ty, d.active ? 12 : 2.2, delta);
+    const tx = THREE.MathUtils.clamp(target.x + d.pitch - (active ? 0 : pointer.y * 0.1), -1.2, 1.2);
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, tx, active ? 12 : 2.2, delta);
+    g.rotation.y = THREE.MathUtils.damp(g.rotation.y, ty, active ? 12 : 2.2, delta);
   });
 
   const geometry = useMemo(() => {
@@ -230,37 +237,8 @@ function Globe({ markers, activeIndex, draggable }: GlobeProps) {
     return geo;
   }, [positions]);
 
-  const dragHandlers = draggable
-    ? {
-        onPointerDown: (e: { pointerType: string; clientX: number; clientY: number; stopPropagation: () => void }) => {
-          if (e.pointerType !== "mouse") return;
-          e.stopPropagation();
-          Object.assign(drag.current, { active: true, x: e.clientX, y: e.clientY });
-          document.body.style.cursor = "grabbing";
-        },
-        onPointerMove: (e: { clientX: number; clientY: number }) => {
-          const d = drag.current;
-          if (!d.active) return;
-          d.yaw += (e.clientX - d.x) * 0.008;
-          d.pitch += (e.clientY - d.y) * 0.006;
-          d.x = e.clientX;
-          d.y = e.clientY;
-        },
-      }
-    : {};
-
-  useEffect(() => {
-    if (!draggable) return;
-    const up = () => {
-      drag.current.active = false;
-      document.body.style.cursor = "";
-    };
-    window.addEventListener("pointerup", up);
-    return () => window.removeEventListener("pointerup", up);
-  }, [draggable]);
-
   return (
-    <group ref={group} rotation={initialRotation} {...dragHandlers}>
+    <group ref={group} rotation={initialRotation}>
       <mesh>
         <sphereGeometry args={[R * 0.985, 64, 64]} />
         <meshBasicMaterial color="#07090f" />

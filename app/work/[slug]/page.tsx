@@ -6,7 +6,7 @@ import { ArrowIcon, DownloadIcon } from "@/components/ui";
 import FlowDiagram from "@/components/work/FlowDiagram";
 import { caseStudies, getCaseStudy } from "@/lib/case-studies";
 import { experience, profile, whatsappLink } from "@/lib/data";
-import { siteUrl } from "@/lib/site";
+import { caseStudyJsonLd, ldScript } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -23,8 +23,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: study.subtitle,
+    keywords: [study.title, ...study.stack, profile.name, "case study"],
     alternates: { canonical: `/work/${study.slug}` },
-    openGraph: { type: "article", url: `/work/${study.slug}`, title, description: study.subtitle },
+    openGraph: {
+      type: "article",
+      url: `/work/${study.slug}`,
+      title,
+      description: study.subtitle,
+      publishedTime: study.published,
+      modifiedTime: study.updated ?? study.published,
+      authors: [profile.name],
+      tags: study.stack,
+    },
     twitter: { card: "summary_large_image", title, description: study.subtitle },
   };
 }
@@ -45,19 +55,9 @@ export default async function CaseStudyPage({ params }: Props) {
     ...(study.next?.length ? [{ id: "next", title: "What's next" }] : []),
   ];
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: `${study.title}: case study`,
-    description: study.subtitle,
-    url: `${siteUrl}/work/${study.slug}`,
-    author: { "@type": "Person", name: profile.name, url: siteUrl },
-    about: study.stack,
-  };
-
   return (
     <main className="relative overflow-x-clip pb-24 pt-28 md:pt-36">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldScript(caseStudyJsonLd(study)) }} />
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px]" aria-hidden>
         <div className="grid-bg absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_70%)]" />
         <div className="absolute -left-40 top-10 h-[480px] w-[480px] rounded-full bg-violet/15 blur-[120px]" />

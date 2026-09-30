@@ -9,7 +9,7 @@ const eslintConfig = defineConfig([
   // React Three Fiber mutates three.js objects (materials, uniforms, meshes) inside useFrame
   // by design — that's how per-frame animation avoids re-rendering React.
   {
-    files: ["components/three/**/*.tsx"],
+    files: ["components/three/**/*.{ts,tsx}"],
     rules: { "react-hooks/immutability": "off" },
   },
 ]);

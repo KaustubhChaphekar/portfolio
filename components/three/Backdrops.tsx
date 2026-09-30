@@ -59,22 +59,28 @@ function HeroStill({ hidden = false }: { hidden?: boolean }) {
 }
 
 // Everyone sees the still first (it's in the server HTML, so it paints immediately).
-// On larger screens, capable devices then boot the live scene once the browser is idle
-// and crossfade to it. Phones keep the (gently drifting) still unless 3D is switched on,
-// which keeps their first load light; the other scenes still go live as you scroll.
+// Devices with a real GPU — phones included — then boot the live scene once the browser
+// is idle and crossfade to it; devices without one keep the gently drifting still.
 export function HeroBackdrop() {
-  const { quality, effects } = usePrefs();
+  const { quality } = usePrefs();
 
-  // Only screens that will run the live hero need the device check up front.
   useEffect(() => {
-    if (effects === "on" || window.matchMedia("(min-width: 900px)").matches) ensureQuality();
-  }, [effects]);
+    if (window.matchMedia("(min-width: 900px)").matches) return ensureQuality();
+    // Phones: check the GPU a few seconds after load, so the first taps and scrolls stay snappy.
+    let id: number | undefined;
+    const later = () => (id = window.setTimeout(ensureQuality, 3000));
+    if (document.readyState === "complete") later();
+    else window.addEventListener("load", later, { once: true });
+    return () => {
+      window.removeEventListener("load", later);
+      window.clearTimeout(id);
+    };
+  }, []);
   const [boot, setBoot] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (quality !== "full") return;
-    if (effects !== "on" && !window.matchMedia("(min-width: 900px)").matches) return;
     const w = window as Window & {
       requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
       cancelIdleCallback?: (id: number) => void;
@@ -85,7 +91,7 @@ export function HeroBackdrop() {
     }
     const id = window.setTimeout(() => setBoot(true), 1200);
     return () => window.clearTimeout(id);
-  }, [quality, effects]);
+  }, [quality]);
 
   const live = quality === "full" && boot;
   return (

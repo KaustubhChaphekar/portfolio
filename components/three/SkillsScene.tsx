@@ -1,12 +1,13 @@
 "use client";
 
-import { Billboard, OrbitControls, Text } from "@react-three/drei";
+import { Billboard, Text } from "@react-three/drei";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Suspense, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { SkillGroup } from "@/lib/data";
 import { useMediaQuery } from "@/lib/hooks";
 import LazyCanvas from "./LazyCanvas";
+import { useCanvasDrag } from "./useCanvasDrag";
 
 const FONT = "/fonts/space-grotesk-500.woff";
 const RADIUS = 2.75;
@@ -124,20 +125,34 @@ function Nucleus() {
   );
 }
 
+// Spins slowly on its own; drag with a mouse or swipe sideways on touch to spin it faster.
 function Spin({ children }: { children: React.ReactNode }) {
   const ref = useRef<THREE.Group>(null);
+  const motion = useRef({ velocity: 0, pitch: 0 });
+  const drag = useCanvasDrag(true, (dx, dy, mouse) => {
+    if (ref.current) ref.current.rotation.y += dx * 0.008;
+    motion.current.velocity = dx * 0.008;
+    if (mouse) motion.current.pitch = THREE.MathUtils.clamp(motion.current.pitch + dy * 0.006, -0.8, 0.8);
+  });
+
   useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.y += delta * 0.12;
+    const g = ref.current;
+    if (!g) return;
+    const m = motion.current;
+    if (!drag.current.active) {
+      g.rotation.y += delta * 0.12 + m.velocity;
+      m.velocity *= Math.pow(0.02, delta); // inertia fades out
+    }
+    g.rotation.x = THREE.MathUtils.damp(g.rotation.x, m.pitch, 6, delta);
   });
   return <group ref={ref}>{children}</group>;
 }
 
 export default function SkillsScene({ groups, activeGroup }: { groups: SkillGroup[]; activeGroup: string | null }) {
-  // Dragging only with a mouse/trackpad — on touch screens the sphere must not swallow page scrolling.
   const finePointer = useMediaQuery("(pointer: fine)", true);
   return (
     <LazyCanvas
-      label="An interactive 3D sphere of skills — drag to rotate"
+      label="An interactive 3D sphere of skills — drag or swipe sideways to rotate"
       wrapperClassName={`h-full w-full ${finePointer ? "cursor-grab active:cursor-grabbing" : ""}`}
       camera={{ position: [0, 0, 8.6], fov: 45 }}
     >
@@ -147,7 +162,6 @@ export default function SkillsScene({ groups, activeGroup }: { groups: SkillGrou
           <Nucleus />
         </Spin>
       </Suspense>
-      {finePointer && <OrbitControls enableZoom={false} enablePan={false} rotateSpeed={0.55} enableDamping />}
     </LazyCanvas>
   );
 }

@@ -14,6 +14,9 @@ export type CaseStudy = {
   period: string;
   role: string;
   status: string;
+  // ISO dates for search engines (Article structured data and the sitemap).
+  published: string;
+  updated?: string;
   art: Project["art"];
   stack: string[];
   summary: string;
@@ -34,6 +37,7 @@ export const caseStudies: CaseStudy[] = [
     period: "Jun – Sep 2026",
     role: "Solo: product, architecture, build, deploy",
     status: "Live · private repo",
+    published: "2026-09-29",
     art: "agent",
     stack: [
       "Next.js 16", "React 19", "TypeScript", "Tailwind v4", "MongoDB / Mongoose", "Gemini", "OpenAI", "ElevenLabs",
@@ -143,6 +147,7 @@ export const caseStudies: CaseStudy[] = [
     period: "2024 – present",
     role: "Full-stack developer & tech lead",
     status: "In production",
+    published: "2026-09-29",
     art: "billing",
     stack: ["Next.js", "Node.js", "TypeScript", "MongoDB", "Razorpay", "GCP Pub/Sub", "Cloud Run", "Jest", "Playwright"],
     summary:
@@ -203,6 +208,7 @@ export const caseStudies: CaseStudy[] = [
     period: "2024 – present",
     role: "Owned all infrastructure & deployments",
     status: "In production",
+    published: "2026-09-29",
     art: "workers",
     stack: ["GCP Pub/Sub", "Cloud Run", "Docker", "Linux VPS", "Redis", "MongoDB", "Vercel", "Sentry", "PostHog", "CloudConvert"],
     summary:

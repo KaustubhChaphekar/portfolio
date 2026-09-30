@@ -21,8 +21,9 @@ export default function Services() {
     <section id="services" className="cv-section relative scroll-mt-20 py-28 md:py-40">
       <div className="section">
         <SectionHeading index="08" eyebrow="Work with me" title="Need a website or web app? I build it and ship it.">
-          I take on freelance projects alongside my work, from a landing page that loads fast to a full SaaS with payments. You deal
-          with one person the whole way: design, build, deploy and support.
+          I take on freelance web development projects alongside my work, from a landing page that loads fast to a full SaaS with
+          payments. I&apos;m based in Nashik, India, and work remotely with clients anywhere. You deal with one person the whole way:
+          design, build, deploy and support.
         </SectionHeading>
 
         <Reveal>
