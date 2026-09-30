@@ -11,13 +11,26 @@ const MODEL = "/models/robot.glb";
 // Clips that play once and then settle back into Idle.
 const ONE_SHOTS = new Set(["Jump", "ThumbsUp", "Wave", "Punch", "No"]);
 
-type RobotProps = { animation: string; onClick?: () => void };
+// Face morph targets built into the model.
+export type RobotExpression = "Angry" | "Surprised" | "Sad" | null;
 
-function Robot({ animation, onClick }: RobotProps) {
+type RobotProps = { animation: string; playKey?: number; expression?: RobotExpression };
+
+function Robot({ animation, playKey = 0, expression = null }: RobotProps) {
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(MODEL);
   const { actions, mixer } = useAnimations(animations, group);
   const current = useRef<THREE.AnimationAction | null>(null);
+
+  // Meshes that carry the face expressions (the head).
+  const faces = useMemo(() => {
+    const found: THREE.Mesh[] = [];
+    scene.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (mesh.isMesh && mesh.morphTargetDictionary && mesh.morphTargetInfluences) found.push(mesh);
+    });
+    return found;
+  }, [scene]);
 
   useEffect(() => {
     scene.traverse((o) => {
@@ -54,7 +67,8 @@ function Robot({ animation, onClick }: RobotProps) {
     [actions],
   );
 
-  useEffect(() => play(animation), [animation, play]);
+  // playKey replays the clip even when the same one is asked for twice in a row.
+  useEffect(() => play(animation), [animation, play, playKey]);
 
   useEffect(() => {
     const onFinished = (e: { action: THREE.AnimationAction }) => {
@@ -64,23 +78,21 @@ function Robot({ animation, onClick }: RobotProps) {
     return () => mixer.removeEventListener("finished", onFinished);
   }, [mixer, play]);
 
-  // The robot turns a little toward the cursor.
   useFrame((_, delta) => {
-    if (!group.current) return;
-    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, pointer.x * 0.45, 3, delta);
+    // The robot turns a little toward the cursor.
+    if (group.current) group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, pointer.x * 0.45, 3, delta);
+    // Ease the face into the requested expression.
+    for (const mesh of faces) {
+      const dict = mesh.morphTargetDictionary!;
+      const influences = mesh.morphTargetInfluences!;
+      for (const [name, index] of Object.entries(dict)) {
+        influences[index] = THREE.MathUtils.damp(influences[index], name === expression ? 1 : 0, 10, delta);
+      }
+    }
   });
 
   return (
-    <group
-      ref={group}
-      dispose={null}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick?.();
-      }}
-      onPointerOver={() => (document.body.style.cursor = "pointer")}
-      onPointerOut={() => (document.body.style.cursor = "")}
-    >
+    <group ref={group} dispose={null}>
       <primitive object={scene} scale={0.42} />
     </group>
   );
@@ -186,9 +198,15 @@ function Platform({ pulseKey }: { pulseKey: number }) {
   );
 }
 
-type SceneProps = { animation: string; activeStage: number; stageCount: number; onRobotClick?: () => void };
+type SceneProps = {
+  animation: string;
+  playKey?: number;
+  expression?: RobotExpression;
+  activeStage: number;
+  stageCount: number;
+};
 
-export default function RobotScene({ animation, activeStage, stageCount, onRobotClick }: SceneProps) {
+export default function RobotScene({ animation, playKey, expression, activeStage, stageCount }: SceneProps) {
   useEffect(() => trackPointer(), []);
   return (
     <LazyCanvas
@@ -203,7 +221,7 @@ export default function RobotScene({ animation, activeStage, stageCount, onRobot
         <directionalLight position={[3, 5, 4]} intensity={1.6} />
         <pointLight position={[-3, 2.5, -2]} intensity={18} color="#5ee7ff" />
         <pointLight position={[3, 1.5, -2.5]} intensity={14} color="#ff6fae" />
-        <Robot animation={animation} onClick={onRobotClick} />
+        <Robot animation={animation} playKey={playKey} expression={expression} />
         <StageRing active={activeStage} count={stageCount} />
         <Platform pulseKey={activeStage} />
         <ContactShadows position={[0, 0.011, 0]} opacity={0.6} scale={5} blur={2.4} far={3} />

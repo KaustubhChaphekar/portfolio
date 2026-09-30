@@ -7,6 +7,7 @@ import { aiAgent, profile } from "@/lib/data";
 import { useReducedMotion } from "@/lib/hooks";
 import { blip } from "@/lib/sound";
 import { RobotStage } from "../three/Backdrops";
+import type { RobotExpression } from "../three/RobotScene";
 import { ArrowIcon, Reveal, SectionHeading } from "../ui";
 
 const STAGE_MS = 2800;
@@ -14,13 +15,23 @@ const DONE_MS = 4200;
 const stages = aiAgent.stages;
 const DONE = stages.length; // index past the last stage = "Published"
 
+// What the robot does each time it's clicked or tapped, in order.
+const REACTIONS: { animation: string; expression: RobotExpression; line: string; ms: number; tone: number }[] = [
+  { animation: "Wave", expression: null, line: "Hi! I'm the agent. I post so Kaustubh doesn't have to.", ms: 2800, tone: 880 },
+  { animation: "Jump", expression: "Surprised", line: "Whoa! You found my secret button.", ms: 2400, tone: 990 },
+  { animation: "ThumbsUp", expression: null, line: "Script, voice, render, upload. All before breakfast.", ms: 2800, tone: 740 },
+  { animation: "Dance", expression: null, line: "Another Short is live. Victory dance!", ms: 3600, tone: 1175 },
+  { animation: "Punch", expression: "Angry", line: "Pow! That's what I do to failed uploads.", ms: 2400, tone: 520 },
+];
+
 export default function AiAgent() {
   const stageRef = useRef<HTMLDivElement>(null);
   const inView = useInView(stageRef, { margin: "-20% 0px" });
   const reduced = useReducedMotion();
   const [step, setStep] = useState(0);
   const [hold, setHold] = useState(0); // extra ms to stay on a step the visitor picked
-  const [waving, setWaving] = useState(false);
+  const [reaction, setReaction] = useState<{ index: number; key: number } | null>(null);
+  const taps = useRef(0);
 
   // Walk through the pipeline while the stage is on screen; a manual pick pauses it for a while.
   useEffect(() => {
@@ -37,13 +48,22 @@ export default function AiAgent() {
     setHold(6000);
   };
 
-  const wave = () => {
-    blip(880, 0.14);
-    setWaving(true);
-    setTimeout(() => setWaving(false), 2400);
+  // Each tap plays the next reaction; the bubble clears once it has had time to be read.
+  const poke = () => {
+    const index = taps.current % REACTIONS.length;
+    taps.current += 1;
+    blip(REACTIONS[index].tone, 0.14);
+    setReaction({ index, key: taps.current });
   };
 
-  const animation = waving ? "Wave" : step === DONE ? "Dance" : stages[step].animation;
+  useEffect(() => {
+    if (!reaction) return;
+    const id = setTimeout(() => setReaction(null), REACTIONS[reaction.index].ms);
+    return () => clearTimeout(id);
+  }, [reaction]);
+
+  const active = reaction ? REACTIONS[reaction.index] : null;
+  const animation = active ? active.animation : step === DONE ? "Dance" : stages[step].animation;
   const current = step === DONE ? null : stages[step];
 
   return (
@@ -66,9 +86,21 @@ export default function AiAgent() {
           <Reveal className="lg:col-span-7">
             <div ref={stageRef} className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-b from-surface-2/80 to-bg/80">
               <div className="grid-bg absolute inset-0 opacity-60 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" aria-hidden />
-              <div className="relative h-[380px] sm:h-[460px] lg:h-[540px]">
-                <RobotStage animation={animation} activeStage={Math.min(step, stages.length - 1)} stageCount={stages.length} onRobotClick={wave} />
-              </div>
+              {/* The whole stage is the tap target — easier than hitting the robot itself on a phone. */}
+              <button
+                type="button"
+                onClick={poke}
+                aria-label="Poke the robot"
+                className="relative block h-[380px] w-full cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cyan sm:h-[460px] lg:h-[540px]"
+              >
+                <RobotStage
+                  animation={animation}
+                  playKey={reaction?.key ?? 0}
+                  expression={active?.expression ?? null}
+                  activeStage={Math.min(step, stages.length - 1)}
+                  stageCount={stages.length}
+                />
+              </button>
 
               {/* HUD */}
               <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-4 sm:p-5">
@@ -96,15 +128,18 @@ export default function AiAgent() {
                     </motion.p>
                   </AnimatePresence>
                 </div>
-                <AnimatePresence>
-                  {waving && (
+                <AnimatePresence mode="popLayout">
+                  {active && reaction && (
                     <motion.p
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="rounded-2xl rounded-br-sm border border-violet/40 bg-violet/15 px-3 py-2 text-sm backdrop-blur"
+                      key={reaction.key}
+                      role="status"
+                      initial={{ opacity: 0, scale: 0.85, y: 6 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ type: "spring", bounce: 0.35, duration: 0.4 }}
+                      className="ml-3 max-w-[48%] origin-bottom-left rounded-2xl rounded-bl-sm border border-violet/40 bg-bg/80 px-3.5 py-2.5 text-[13px] leading-snug shadow-lg shadow-violet/20 backdrop-blur-xl sm:max-w-[260px] sm:text-sm"
                     >
-                      Hi! I publish so Kaustubh doesn&apos;t have to.
+                      {active.line}
                     </motion.p>
                   )}
                 </AnimatePresence>
@@ -148,7 +183,7 @@ export default function AiAgent() {
                 </p>
               </div>
             </div>
-            <p className="mt-3 text-center font-mono text-[11px] text-faint">Click the robot · click a step to jump</p>
+            <p className="mt-3 text-center font-mono text-[11px] text-faint">Tap the robot for its {REACTIONS.length} moves · pick a step to jump</p>
           </Reveal>
 
           {/* Story */}
