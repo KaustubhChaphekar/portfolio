@@ -174,11 +174,40 @@ function ReadySignal({ enabled, onReady }: { enabled: boolean; onReady?: () => v
   return null;
 }
 
+// Switches the site to still images only when this device truly can't keep up: under 20 fps
+// for two 4-second windows in a row. Hitches (a tab switch, a long scroll pause) are skipped,
+// and nothing is measured while the hero is off screen or during the first seconds of shader setup.
+function SlowDeviceWatchdog({ enabled }: { enabled: boolean }) {
+  const s = useRef({ time: 0, frames: 0, warmup: 3, strikes: 0, done: false });
+  useFrame((_, delta) => {
+    const w = s.current;
+    if (!enabled || w.done || delta > 0.25) return;
+    if (w.warmup > 0) {
+      w.warmup -= delta;
+      return;
+    }
+    w.time += delta;
+    w.frames += 1;
+    if (w.time < 4) return;
+    const fps = w.frames / w.time;
+    w.time = 0;
+    w.frames = 0;
+    w.strikes = fps < 20 ? w.strikes + 1 : 0;
+    if (w.strikes >= 2) {
+      w.done = true;
+      degradeToStatic();
+    }
+  });
+  return null;
+}
+
 export default function HeroScene({ visible = true, onReady }: { visible?: boolean; onReady?: () => void }) {
   const wide = useMediaQuery("(min-width: 900px)", true);
   const reduced = useReducedMotion();
   const [active, setActive] = useState(true);
-  const [dpr, setDpr] = useState(1.5);
+  // Never render above the screen's own density (a 1× monitor at 1.5× costs 2.25× the pixels).
+  const [maxDpr] = useState(() => Math.min(1.5, window.devicePixelRatio || 1));
+  const [dpr, setDpr] = useState(maxDpr);
   const [portraitLoaded, setPortraitLoaded] = useState(false);
 
   useEffect(() => {
@@ -203,12 +232,15 @@ export default function HeroScene({ visible = true, onReady }: { visible?: boole
       >
         <color attach="background" args={["#05060a"]} />
         <ReadySignal enabled={portraitLoaded} onReady={onReady} />
+        {/* Resolution follows the frame rate in small steps between 0.75× and the screen's own
+            density. If it keeps flip-flopping it settles at 1× and keeps animating; it never
+            switches to still images (that's SlowDeviceWatchdog's job, for truly slow devices). */}
         <PerformanceMonitor
-          flipflops={3}
-          onDecline={() => setDpr(1)}
-          onIncline={() => setDpr(Math.min(2, window.devicePixelRatio))}
-          onFallback={degradeToStatic}
+          flipflops={6}
+          onChange={({ factor }) => setDpr(Math.round((0.75 + (maxDpr - 0.75) * factor) * 4) / 4)}
+          onFallback={() => setDpr(Math.min(1, maxDpr))}
         />
+        <SlowDeviceWatchdog enabled={active && !reduced} />
         <Stars count={wide ? 1400 : 700} />
         <Rig wide={wide} reduced={reduced} onPortraitLoaded={() => setPortraitLoaded(true)} />
         <EffectComposer multisampling={0}>
