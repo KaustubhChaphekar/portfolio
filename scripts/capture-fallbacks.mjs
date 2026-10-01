@@ -31,7 +31,8 @@ const browser = await chromium.launch({
 });
 
 // Hide all page content so only the WebGL canvas is left in the shot.
-const onlyHero = `header, main, footer, button[aria-label="Ask my AI assistant"] { visibility: hidden !important; }`;
+// Children are listed too: some page styles set descendants back to visible.
+const onlyHero = `header, header *, main, main *, footer, footer *, button[aria-label="Ask my AI assistant"] { visibility: hidden !important; }`;
 const onlyScene = (scope) => `
   html, body { background: transparent !important; }
   * { visibility: hidden !important; }
@@ -47,7 +48,8 @@ async function page(viewport, deviceScaleFactor) {
 
 async function hero(name, viewport, dpr) {
   const { ctx, p } = await page(viewport, dpr);
-  await p.waitForTimeout(5000);
+  // The live portrait boots when the browser is idle, then crossfades in over a second.
+  await p.waitForTimeout(9000);
   await p.addStyleTag({ content: onlyHero });
   await p.waitForTimeout(300);
   await p.screenshot({ path: `${OUT}/${name}`, type: "jpeg", quality: 82 });

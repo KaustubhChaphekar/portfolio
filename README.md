@@ -4,7 +4,7 @@ A Next.js 16 portfolio with real-time 3D (React Three Fiber + three.js), case st
 
 ## What's inside
 
-- **Hero**: a noise-displaced shader core, orbit rings, a particle galaxy and bloom. It follows the cursor and drifts away on scroll.
+- **Hero**: a particle portrait of me, built from about 22,000 glowing particles in front of a galaxy halo. It turns toward the cursor, particles scatter where the cursor passes, and scrolling breaks it into the galaxy (scrolling back re-forms it). The particle map comes from `node scripts/make-portrait.mjs`, which reads `assets/me/kaustubh-cutout.png` (the photo with its background removed).
 - **AI Social Agent**: an animated robot (CC0, Quaternius) acts out each pipeline step in sync with a clickable stepper.
 - **Case studies** at `/work/[slug]`, each with an architecture diagram, key decisions and its own Open Graph image. The content lives in [`lib/case-studies.ts`](lib/case-studies.ts).
 - **Skills sphere**: a draggable 3D cloud of skills; hovering a category lights up its words.

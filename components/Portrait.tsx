@@ -1,5 +1,7 @@
 import Image from "next/image";
-import portrait from "@/public/me/kaustubh-chaphekar.jpg";
+// Imported only for its blur placeholder; the page uses the stable public URL below, so Google
+// sees the same image address on the page, in the sitemap and in the structured data.
+import portraitFile from "@/public/me/kaustubh-chaphekar.jpg";
 import { experience, profile } from "@/lib/data";
 import { TiltCard } from "./ui";
 
@@ -13,9 +15,12 @@ export default function Portrait() {
       <figure className="relative rounded-[2rem] bg-gradient-to-br from-cyan/70 via-violet/60 to-pink/70 p-[1.5px] shadow-[0_40px_90px_-35px_rgb(155_140_255/0.55)]">
         <div className="relative overflow-hidden rounded-[calc(2rem-1.5px)] bg-bg">
           <Image
-            src={portrait}
+            src={profile.photo}
             alt={portraitAlt}
+            width={1254}
+            height={1254}
             placeholder="blur"
+            blurDataURL={portraitFile.blurDataURL}
             sizes="(min-width: 1024px) 380px, 80vw"
             className="aspect-[4/5] w-full object-cover object-[50%_35%] transition-transform duration-700 group-hover:scale-[1.03]"
           />
@@ -47,7 +52,7 @@ export function Avatar({ size = 40, className = "" }: { size?: number; className
       style={{ width: size, height: size }}
     >
       <Image
-        src={portrait}
+        src={profile.photo}
         alt={profile.name}
         width={size * 2}
         height={size * 2}

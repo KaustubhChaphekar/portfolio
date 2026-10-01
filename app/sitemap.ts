@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { caseStudies } from "@/lib/case-studies";
+import { profile } from "@/lib/data";
 import { siteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -9,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1,
-      images: [`${siteUrl}/opengraph-image`],
+      images: [`${siteUrl}${profile.photo}`, `${siteUrl}/opengraph-image`],
     },
     ...caseStudies.map((c) => ({
       url: `${siteUrl}/work/${c.slug}`,

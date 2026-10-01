@@ -20,6 +20,7 @@ export const seo = {
 const ids = {
   website: `${productionUrl}/#website`,
   person: `${productionUrl}/#person`,
+  photo: `${productionUrl}/#photo`,
   wallxy: `${productionUrl}/#wallxy`,
 };
 
@@ -33,7 +34,7 @@ const person = {
   description: profile.summary,
   url: productionUrl,
   email: `mailto:${profile.email}`,
-  image: { "@type": "ImageObject", url: `${productionUrl}${profile.photo}`, width: 1254, height: 1254, caption: profile.name },
+  image: { "@id": ids.photo },
   sameAs: [profile.linkedin, profile.github],
   address: { "@type": "PostalAddress", addressLocality: "Nashik", addressRegion: "Maharashtra", addressCountry: "IN" },
   worksFor: { "@type": "Organization", "@id": ids.wallxy, name: experience.company, url: experience.url },
@@ -45,6 +46,23 @@ const person = {
     "@type": "Offer",
     itemOffered: { "@type": "Service", name: s.title, description: s.body, areaServed: "Worldwide", provider: { "@id": ids.person } },
   })),
+};
+
+// The portrait, described so Google Images can show it for searches of your name.
+const photo = {
+  "@type": "ImageObject",
+  "@id": ids.photo,
+  url: `${productionUrl}${profile.photo}`,
+  contentUrl: `${productionUrl}${profile.photo}`,
+  width: 1254,
+  height: 1254,
+  encodingFormat: "image/jpeg",
+  name: `${profile.name}`,
+  caption: `${profile.name}, ${profile.role} in ${profile.location}`,
+  representativeOfPage: true,
+  creator: { "@id": ids.person },
+  creditText: profile.name,
+  copyrightNotice: `© ${profile.name}`,
 };
 
 const website = {
@@ -64,6 +82,7 @@ export function homeJsonLd() {
     "@graph": [
       website,
       person,
+      photo,
       {
         "@type": "ProfilePage",
         "@id": `${productionUrl}/#profile`,
@@ -71,6 +90,8 @@ export function homeJsonLd() {
         name: seo.title,
         isPartOf: { "@id": ids.website },
         mainEntity: { "@id": ids.person },
+        primaryImageOfPage: { "@id": ids.photo },
+        image: { "@id": ids.photo },
         dateModified: new Date().toISOString(),
         hasPart: {
           "@type": "SoftwareSourceCode",
@@ -91,6 +112,7 @@ export function caseStudyJsonLd(study: CaseStudy) {
     "@graph": [
       website,
       person,
+      photo,
       {
         "@type": "Article",
         "@id": `${url}#article`,
