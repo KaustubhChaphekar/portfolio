@@ -41,6 +41,10 @@ Useful URLs:
 - `?effects=on`, `?effects=off` and `?effects=auto` force the 3D mode (the choice is remembered).
 - `/work/ai-social-agent`, `/work/subscription-engine` and `/work/worker-pipelines` are the case studies.
 
+### Regenerating the favicon
+
+`app/favicon.ico` (16–96 px, for Google and older browsers) is built from `app/icon.svg`. After changing the logo, run `node scripts/make-favicon.mjs`.
+
 ### Regenerating the still images
 
 If you change a 3D scene, refresh its still twin in `public/fallback/`:
