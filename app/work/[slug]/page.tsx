@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProjectArt from "@/components/sections/ProjectArt";
@@ -50,6 +51,7 @@ export default async function CaseStudyPage({ params }: Props) {
   const toc = [
     { id: "problem", title: "The problem" },
     { id: "architecture", title: "Architecture" },
+    ...(study.gallery?.length ? [{ id: "screens", title: "Inside the app" }] : []),
     ...study.sections.map((s) => ({ id: slugify(s.title), title: s.title })),
     { id: "decisions", title: "Key decisions" },
     ...(study.next?.length ? [{ id: "next", title: "What's next" }] : []),
@@ -107,9 +109,24 @@ export default async function CaseStudyPage({ params }: Props) {
           ))}
         </dl>
 
-        <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-3xl border border-line bg-bg sm:aspect-[21/9]">
-          <ProjectArt art={study.art} />
-        </div>
+        {study.cover ? (
+          <figure className="mt-6">
+            <Image
+              src={study.cover.src}
+              alt={study.cover.alt}
+              width={study.cover.width}
+              height={study.cover.height}
+              sizes="(min-width: 1280px) 1200px, 100vw"
+              priority
+              className="h-auto w-full rounded-3xl border border-line"
+            />
+            <figcaption className="mt-3 text-sm text-muted">{study.cover.caption}</figcaption>
+          </figure>
+        ) : (
+          <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-3xl border border-line bg-bg sm:aspect-[21/9]">
+            <ProjectArt art={study.art} />
+          </div>
+        )}
 
         <div className="mt-6 flex flex-wrap gap-1.5">
           {study.stack.map((t) => (
@@ -163,6 +180,30 @@ export default async function CaseStudyPage({ params }: Props) {
                 <FlowDiagram lanes={study.architecture.lanes} />
               </div>
             </section>
+
+            {study.gallery?.length ? (
+              <section id="screens" className="scroll-mt-28 pt-16">
+                <h2 className="font-display text-3xl font-semibold tracking-tight">Inside the app</h2>
+                <p className="mt-4 leading-relaxed text-muted">Screenshots from the live dashboard.</p>
+                <div className="mt-8 grid gap-8">
+                  {study.gallery.map((shot) => (
+                    <figure key={shot.src}>
+                      <a href={shot.src} target="_blank" rel="noopener noreferrer" aria-label={`Open full size: ${shot.caption}`}>
+                        <Image
+                          src={shot.src}
+                          alt={shot.alt}
+                          width={shot.width}
+                          height={shot.height}
+                          sizes="(min-width: 1024px) 768px, 100vw"
+                          className="h-auto w-full rounded-2xl border border-line transition hover:border-line-strong"
+                        />
+                      </a>
+                      <figcaption className="mt-3 text-sm text-muted">{shot.caption}</figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             {study.sections.map((s) => (
               <section key={s.title} id={slugify(s.title)} className="scroll-mt-28 pt-16">

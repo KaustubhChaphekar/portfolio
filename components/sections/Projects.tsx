@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { projects } from "@/lib/data";
 import { ArrowIcon, Reveal, SectionHeading, TiltCard } from "../ui";
@@ -18,7 +19,17 @@ export default function Projects() {
               <TiltCard className="h-full rounded-3xl">
                 <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-surface/70 backdrop-blur-xl transition-colors group-hover:border-line-strong">
                   <div className={`relative overflow-hidden border-b border-line bg-bg ${p.wide ? "aspect-[16/9] md:aspect-[21/9]" : "aspect-[16/9]"}`}>
-                    <ProjectArt art={p.art} />
+                    {p.image ? (
+                      <Image
+                        src={p.image.src}
+                        alt={p.image.alt}
+                        fill
+                        sizes="(min-width: 1024px) 800px, 100vw"
+                        className="object-cover object-left-top transition-transform duration-700 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <ProjectArt art={p.art} />
+                    )}
                   </div>
                   <div className="flex flex-1 flex-col p-6 sm:p-7">
                     <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.16em] text-muted">

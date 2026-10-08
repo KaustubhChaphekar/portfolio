@@ -6,6 +6,8 @@ import type { Project } from "./data";
 export type FlowNode = { label: string; detail?: string };
 export type FlowLane = { title: string; nodes: FlowNode[] };
 
+export type Shot = { src: string; alt: string; caption: string; width: number; height: number };
+
 export type CaseStudy = {
   slug: string;
   title: string;
@@ -18,6 +20,9 @@ export type CaseStudy = {
   published: string;
   updated?: string;
   art: Project["art"];
+  // Real screenshots (in public/work/<slug>/). The cover replaces the drawn artwork.
+  cover?: Shot;
+  gallery?: Shot[];
   stack: string[];
   summary: string;
   facts: { value: string; label: string }[];
@@ -39,6 +44,43 @@ export const caseStudies: CaseStudy[] = [
     status: "Live · private repo",
     published: "2026-09-29",
     art: "agent",
+    cover: {
+      src: "/work/ai-social-agent/dashboard.webp",
+      alt: "AI Social Agent dashboard showing subscribers, weekly views, the posting schedule and hourly scheduler check-ins",
+      caption: "The dashboard: channel numbers, the posting schedule and every hourly scheduler check-in.",
+      width: 1906,
+      height: 880,
+    },
+    gallery: [
+      {
+        src: "/work/ai-social-agent/run.webp",
+        alt: "A pipeline run with each step ticked off and a live log of script, fact check, voiceover and scene rendering",
+        caption: "A scheduled run: each step ticks off live, with a log of the script, fact check, voiceover and every scene.",
+        width: 1906,
+        height: 913,
+      },
+      {
+        src: "/work/ai-social-agent/analytics.webp",
+        alt: "Analytics table listing each published Short with views, likes, average percentage viewed and watch time",
+        caption: "Analytics per video: views, likes, how much of each Short people watched, and watch time.",
+        width: 1892,
+        height: 915,
+      },
+      {
+        src: "/work/ai-social-agent/posts.webp",
+        alt: "List of recently published Shorts with thumbnails, titles and dates",
+        caption: "Recent posts, two a day, each with its generated thumbnail and title.",
+        width: 1906,
+        height: 919,
+      },
+      {
+        src: "/work/ai-social-agent/ideas.webp",
+        alt: "Ideas page with themed idea generators and a form to add a topic to the queue",
+        caption: "The idea queue: add a topic yourself, or let the AI suggest a batch by theme.",
+        width: 1906,
+        height: 914,
+      },
+    ],
     stack: [
       "Next.js 16", "React 19", "TypeScript", "Tailwind v4", "MongoDB / Mongoose", "Gemini", "OpenAI", "ElevenLabs",
       "Pexels", "FFmpeg", "YouTube Data API", "SimpleWebAuthn", "Web Push", "Resend", "GitHub Actions", "Render",
@@ -46,8 +88,8 @@ export const caseStudies: CaseStudy[] = [
     summary:
       "One daily run takes an idea from a queue, writes a 5–7 scene script, voices it with word-level timings, finds matching vertical footage, renders a captioned 9:16 video with music and motion, uploads it to YouTube, then comments, files it into a playlist and notifies me. A secure, installable dashboard shows every step live.",
     facts: [
-      { value: "6", label: "pipeline stages, each with a fallback" },
-      { value: "4", label: "AI & media APIs orchestrated" },
+      { value: "33", label: "Shorts published by 8 Oct 2026, two a day" },
+      { value: "11.9K", label: "views in the 7 days to 8 Oct 2026" },
       { value: "13", label: "node:test suites, incl. a real FFmpeg render" },
       { value: "24", label: "commits from first idea to production" },
     ],

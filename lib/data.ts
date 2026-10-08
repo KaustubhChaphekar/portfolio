@@ -159,6 +159,7 @@ export type Project = {
   tags: string[];
   href?: string;
   art: "agent" | "billing" | "workers" | "explore" | "finance";
+  image?: { src: string; alt: string }; // a real screenshot, shown instead of the drawn art
   wide?: boolean;
 };
 
@@ -172,6 +173,7 @@ export const projects: Project[] = [
     tags: ["Next.js 16", "Gemini", "ElevenLabs", "FFmpeg", "YouTube API"],
     href: "/work/ai-social-agent",
     art: "agent",
+    image: { src: "/work/ai-social-agent/dashboard.webp", alt: "AI Social Agent dashboard" },
     wide: true,
   },
   {
