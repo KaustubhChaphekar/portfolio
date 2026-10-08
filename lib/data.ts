@@ -121,7 +121,7 @@ export const aiAgent = {
   kind: "Personal project",
   status: "Live · private repo",
   headline: "An autonomous agent that writes, voices, edits and publishes a YouTube Short every day.",
-  body: "One daily run takes an idea from a queue (or lets the AI pick one), writes a 5–7 scene script, voices it with word-level timings, finds matching vertical footage, renders a captioned 9:16 video with music and motion, uploads it to YouTube, then drops a first comment and files it into a playlist. A secure, installable dashboard shows each step light up live — and a review mode lets me approve, retitle or re-thumbnail before anything goes public.",
+  body: "One daily run takes an idea from a queue (or lets the AI pick one), writes a 5–7 scene script, voices it with word-level timings, finds matching vertical footage, renders a captioned 9:16 video with music and motion, uploads it to YouTube, then drops a first comment, files it into a playlist and replies to viewers' comments. A second AI pass fact-checks every script, and the AI picks the stock clip that best fits each line. A secure, installable dashboard shows each step light up live — and a review mode lets me approve, retitle or re-thumbnail before anything goes public.",
   stages: [
     { key: "script", label: "Script", tool: "Gemini / OpenAI", detail: "5–7 scene script, title, alt titles and thumbnail text as strict JSON — learns from which hooks got the most views.", animation: "Idle" },
     { key: "voice", label: "Voice", tool: "ElevenLabs", detail: "Flash v2.5 voice-over with word timings; falls back to the free Gemini voice when quota runs out.", animation: "Yes" },
@@ -142,7 +142,7 @@ export const aiAgent = {
     { value: "6", label: "pipeline stages" },
     { value: "4", label: "AI & media APIs orchestrated" },
     { value: "13", label: "node:test suites incl. a real FFmpeg render" },
-    { value: "1/day", label: "Shorts, fully automatic" },
+    { value: "2/day", label: "Shorts, fully automatic" },
   ],
   stack: [
     "Next.js 16", "React 19", "TypeScript", "Tailwind v4", "MongoDB / Mongoose", "Gemini", "OpenAI",

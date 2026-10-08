@@ -43,6 +43,7 @@ export const caseStudies: CaseStudy[] = [
     role: "Solo: product, architecture, build, deploy",
     status: "Live · private repo",
     published: "2026-09-29",
+    updated: "2026-10-08",
     art: "agent",
     cover: {
       src: "/work/ai-social-agent/dashboard.webp",
@@ -133,9 +134,20 @@ export const caseStudies: CaseStudy[] = [
         title: "The pipeline",
         bullets: [
           "Script: the LLM returns a title, two alternative titles, thumbnail texts, a 3-second hook and 5–7 scenes (narration + a filmable stock-footage query) as strict JSON. It avoids recent topics and, once 5+ videos are two days old, learns from which hooks got the most views.",
+          "Fact check: a second AI pass checks the script against its sources. If a claim can't be supported the script is rewritten once, and any doubt that remains is written to the run log.",
           "Voice: ElevenLabs returns audio with word timings for synced captions; when quota runs low or a call fails, the free Gemini voice takes over, and a low-quota alert fires at 20% remaining.",
-          "Render: FFmpeg builds a 9:16 video with word-by-word captions and highlighted key words, a title card, a slow pan on every clip, a progress bar and royalty-free background music.",
+          "Footage: for each scene the AI looks at a frame from the top five stock clips, scores how well each fits the line, and uses the best one. It adds about 20 seconds per video.",
+          "Render: FFmpeg builds a 9:16 video with word-by-word captions and highlighted key words, a title card, a camera move the script chooses for each scene (push-in, pull-out, pan or tilt), a progress bar and royalty-free background music.",
           "Publish: upload, custom thumbnail where YouTube allows it, add to a channel playlist, and post a first comment that asks viewers a question.",
+        ],
+      },
+      {
+        title: "After it publishes",
+        bullets: [
+          "Two Shorts a day: an optional second post at its own time, with the same never-twice-per-slot guarantee.",
+          "Comment replies: every 30 minutes the AI drafts a short, specific reply to new comments in the commenter's language. It skips spam and trolls, never auto-answers sensitive comments, and stops at a daily limit. Replies can post automatically, wait for approval, or be switched off.",
+          "Themed ideas: one click adds five ideas of a kind (stories, practices, quotes explained), and those videos also go into that theme's own playlist.",
+          "Weekly summary email with views, subscribers gained, watch time and the best video of the week.",
         ],
       },
       {
